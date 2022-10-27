@@ -8,8 +8,8 @@ import (
 )
 
 type MsgHandle struct {
-	Apis             map[uint32]ziface.IRouter //存放每个MsgId 所对应的处理方法的map属性
-	WorkerPoolSize   uint32                    //业务工作woker
+	Apis             map[uint32]ziface.IRouter // 存放每个MsgId 所对应的处理方法的map属性
+	WorkerPoolSize   uint32                    // 业务工作woker
 	TaskQueue        []chan ziface.IRequest    // worker负责取任务的消息队列
 	MaxWorkerTaskLen int
 }

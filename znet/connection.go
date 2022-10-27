@@ -152,7 +152,7 @@ func (c *Connection) SendBuffMsg(msgId uint32, data []byte) error {
 	return nil
 }
 
-//启动链接
+//Start 启动链接
 func (c *Connection) Start() {
 	//开启处理该链接督导客户端的数据后的请求业务
 	go c.StartReader()
@@ -197,17 +197,18 @@ func (c *Connection) RemoteAddr() net.Addr {
 	return c.Conn.RemoteAddr()
 }
 
-//从当前连接获取原始的socket TCPConn
+//GetTCPConnection 从当前连接获取原始的socket TCPConn
 func (c *Connection) GetTCPConnection() *net.TCPConn {
 	return c.Conn
 }
 
-//直接将Message数据发送数据给远程的TCP客户端
+//SendMsg 直接将Message数据发送数据给远程的TCP客户端
 func (c *Connection) SendMsg(msgId uint32, data []byte) error {
 	//1. 判断链接是否关闭，如果已经关闭了，则不应该继续发送
 	if c.isClosed == true {
 		return errors.New("Connection closed when send msg")
 	}
+
 	//将data封包，并且发送
 	dp := NewDataPack(c.TcpServer.GetGinxConf().MaxPacketSize)
 	msg, err := dp.Pack(NewMsgPackage(msgId, data))
@@ -220,14 +221,14 @@ func (c *Connection) SendMsg(msgId uint32, data []byte) error {
 	return nil
 }
 
-//设置链接属性
+//SetProperty 设置链接属性
 func (c *Connection) SetProperty(key string, value interface{}) {
 	c.propertyLock.Lock()
 	defer c.propertyLock.Unlock()
 	c.property[key] = value
 }
 
-//获取链接属性
+//GetProperty 获取链接属性
 func (c *Connection) GetProperty(key string) (interface{}, error) {
 	c.propertyLock.RLock()
 	defer c.propertyLock.RUnlock()
@@ -238,7 +239,7 @@ func (c *Connection) GetProperty(key string) (interface{}, error) {
 	}
 }
 
-//移除链接属性
+//RemoveProperty 移除链接属性
 func (c *Connection) RemoveProperty(key string) {
 	c.propertyLock.Lock()
 	defer c.propertyLock.Unlock()
