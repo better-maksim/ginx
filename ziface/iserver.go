@@ -2,7 +2,7 @@ package ziface
 
 import "github.com/better-maksim/ginx/utils"
 
-//定义服务器接口
+// IServer 定义服务器接口
 type IServer interface {
 	// GetGinxConf 取配置
 	GetGinxConf() *utils.GinxConf

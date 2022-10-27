@@ -10,8 +10,8 @@ import (
 
 // ConnManager 连接管理模块
 type ConnManager struct {
-	connections map[uint32]ziface.IConnection //管理的连接信息
-	connLock    sync.RWMutex                  //读写连接的读写锁
+	connections map[uint32]ziface.IConnection // 管理的连接信息
+	connLock    sync.RWMutex                  // 读写连接的读写锁
 }
 
 // NewConnManager 创建一个链接管理
@@ -26,7 +26,7 @@ func (connMgr *ConnManager) Add(conn ziface.IConnection) {
 	//保护共享资源Map 加写锁
 	connMgr.connLock.Lock()
 	defer connMgr.connLock.Unlock()
-	//将conn连接添加到ConnMananger中
+	//将 conn 连接添加到 ConnManager 中
 	connMgr.connections[conn.GetConnID()] = conn
 	fmt.Println("connection add to ConnManager successfully: conn num = ", connMgr.Len())
 }

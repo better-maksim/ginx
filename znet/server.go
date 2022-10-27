@@ -30,6 +30,8 @@ type Server struct {
 	OnConnStop func(conn ziface.IConnection)
 
 	Config *utils.GinxConf
+	// 是否开启 debug 模式，用来在控制台打印输出更多细节
+	Debug bool
 }
 
 func (s *Server) GetGinxConf() *utils.GinxConf {
@@ -82,14 +84,17 @@ func (s *Server) CallOnConnStop(conn ziface.IConnection) {
 // Start 启动服务
 func (s *Server) Start() {
 	// 如果我们的方法正确，运行时就会打印出Version: V0.4, MaxConn: 3,  MaxPacketSize: 4096
+
 	fmt.Printf("[START] Server name: %s,listenner at IP: %s, Port %d is starting\n", s.Name, s.IP, s.Port)
-	fmt.Printf("[Zinx] Version: %s, MaxConn: %d, MaxPacketSize: %d\n",
+
+	fmt.Printf("[ginx] Version: %s, MaxConn: %d, MaxPacketSize: %d\n",
 		s.Config.Version,
 		s.Config.MaxConn,
 		s.Config.MaxPacketSize)
 
 	//开启第一个go 去做服务端的lister业务
 	go func() {
+
 		//0. 启动worker pool
 		s.msgHandler.StartWorkerPool()
 
@@ -97,12 +102,12 @@ func (s *Server) Start() {
 		addr, err := net.ResolveTCPAddr(s.IPVersion, fmt.Sprintf("%s:%d", s.IP, s.Port))
 
 		if err != nil {
-			fmt.Println("listten", s.IPVersion, "err", err)
+			fmt.Println("listen", s.IPVersion, "err", err)
 			return
 		}
 
-		//2. 监听listenner
-		listenner, err := net.ListenTCP(s.IPVersion, addr)
+		//2. 监听listener
+		listener, err := net.ListenTCP(s.IPVersion, addr)
 
 		if err != nil {
 			fmt.Println("listen", s.IPVersion, "err", err)
@@ -117,7 +122,7 @@ func (s *Server) Start() {
 		//3. 启动 server 网络链接业务
 		for {
 			//3.1 阻塞等待客户端建立连接请求
-			conn, err := listenner.AcceptTCP()
+			conn, err := listener.AcceptTCP()
 			if err != nil {
 				fmt.Println("Accept err ", err)
 				continue
@@ -130,7 +135,7 @@ func (s *Server) Start() {
 			}
 			//3.3 Server.sStart() 处理新的链接请求业务方法，此时应该有hanndler和conn是绑定的
 			//我们这里暂时做一个最大512字节的回显服务
-			dealConn := NewConntion(s, conn, cid, s.msgHandler)
+			dealConn := NewConnection(s, conn, cid, s.msgHandler)
 			cid++
 			go dealConn.Start()
 		}
@@ -139,7 +144,7 @@ func (s *Server) Start() {
 }
 
 func (s *Server) Stop() {
-	fmt.Println("[STOP] Zinx server , name ", s.Name)
+	fmt.Println("[STOP] Ginx server , name ", s.Name)
 	//将其他需要清理的连接信息或者其他信息 也要一并停止或者清理
 	s.ConnMgr.ClearConn()
 }
@@ -147,13 +152,13 @@ func (s *Server) Stop() {
 func (s *Server) Serve() {
 	s.Start()
 	//TODO： Server.Serve() 是否在启动服务的时候 还要处理其他的事情呢 可以在这里添加
-	//阻塞,否则主Go退出， listenner的go将会退出
+	//阻塞,否则主Go退出， listener的go将会退出
 	for {
 		time.Sleep(10 * time.Second)
 	}
 }
 
-//路由功能：给当前服务注册一个路由业务方法，供客户端链接处理使用
+// AddRouter 路由功能：给当前服务注册一个路由业务方法，供客户端链接处理使用
 func (s *Server) AddRouter(msgId uint32, router ziface.IRouter) {
 	s.msgHandler.AddRouter(msgId, router)
 }

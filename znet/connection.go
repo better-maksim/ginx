@@ -15,7 +15,7 @@ type Connection struct {
 	TcpServer ziface.IServer //当前conn属于哪个server，在conn初始化的时候添加即可
 	//当前连接的socket TCP套接字
 	Conn *net.TCPConn
-	//当前链接的id，也可以称作为 sessionid，id全局唯一
+	//当前链接的id，也可以称作为 session id，id全局唯一
 	ConnID uint32
 	//当前连接的关闭状态
 	isClosed bool
@@ -33,7 +33,7 @@ type Connection struct {
 	propertyLock sync.RWMutex
 }
 
-func NewConntion(server ziface.IServer, conn *net.TCPConn, connID uint32, msgHandler ziface.IMsgHandle) *Connection {
+func NewConnection(server ziface.IServer, conn *net.TCPConn, connID uint32, msgHandler ziface.IMsgHandle) *Connection {
 	c := &Connection{
 		TcpServer:    server,
 		Conn:         conn,

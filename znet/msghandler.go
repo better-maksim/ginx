@@ -9,7 +9,7 @@ import (
 
 type MsgHandle struct {
 	Apis             map[uint32]ziface.IRouter // 存放每个MsgId 所对应的处理方法的map属性
-	WorkerPoolSize   uint32                    // 业务工作woker
+	WorkerPoolSize   uint32                    // 业务工作Worker
 	TaskQueue        []chan ziface.IRequest    // worker负责取任务的消息队列
 	MaxWorkerTaskLen int
 }
@@ -76,7 +76,9 @@ func (mh *MsgHandle) SendMsgToTaskQueue(request ziface.IRequest) {
 	//根据ConnID来分配当前的连接应该由哪个worker负责处理
 	//轮询的平均分配法则
 	//得到需要处理此条连接的workerID
+
 	fmt.Print(mh.WorkerPoolSize)
+
 	workerID := request.GetConnection().GetConnID() % mh.WorkerPoolSize
 	fmt.Println("Add ConnID=", request.GetConnection().GetConnID(), " request msgID=", request.GetMsgId(), "to workerID=", workerID)
 	//将请求消息发送给任务队列
